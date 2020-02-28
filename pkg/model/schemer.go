@@ -21,9 +21,8 @@ import (
 	"github.com/altinity/clickhouse-operator/pkg/model/clickhouse"
 	"github.com/altinity/clickhouse-operator/pkg/util"
 
-	"fmt"
-	"github.com/MakeNowJust/heredoc"
 	"github.com/golang/glog"
+        "github.com/MakeNowJust/heredoc"
 	"strings"
 )
 
@@ -57,9 +56,12 @@ func (s *Schemer) getObjectListFromClickHouse(serviceUrl string, sql string) ([]
 	// Results
 	names := make([]string, 0)
 	sqlStatements := make([]string, 0)
+        //TODO:Make it configurable
+        newServiceUrl:= "chi-repl-05-replicated-0-0.default.svc.cluster.local"
 
-	glog.V(1).Info(serviceUrl)
-	conn := s.newConn(serviceUrl)
+	glog.V(1).Infof("running against %s",newServiceUrl)
+        
+	conn := s.newConn(newServiceUrl)
 	var rows *sqlmodule.Rows = nil
 	var err error
 	rows, err = conn.Query(sql)
@@ -83,9 +85,9 @@ func (s *Schemer) getObjectListFromClickHouse(serviceUrl string, sql string) ([]
 // GetCreateDistributedObjects returns a list of objects that needs to be created on a shard in a cluster
 // That includes all Distributed tables, corresponding local tables, and databases, if necessary
 func (s *Schemer) ClusterGetCreateDistributedObjects(chi *chop.ClickHouseInstallation, cluster *chop.ChiCluster) ([]string, []string, error) {
-	// system_tables := fmt.Sprintf("cluster('%s', system, tables)", cluster.Name)
-	hosts := CreatePodFQDNsOfCluster(cluster)
-	system_tables := fmt.Sprintf("remote('%s', system, tables)", strings.Join(hosts, ","))
+	system_tables := "system.tables"//fmt.Sprintf("cluster('%s', system, tables)", cluster.Name)
+	//hosts := CreatePodFQDNsOfCluster(cluster)
+	//system_tables := fmt.Sprintf("remote('%s', system, tables)", strings.Join(hosts, ","))
 
 	sql := heredoc.Doc(strings.ReplaceAll(`
 		SELECT DISTINCT 
@@ -157,8 +159,9 @@ func (s *Schemer) GetCreateReplicatedObjects(
 		glog.V(1).Info("Can not find shard for replica")
 		return nil, nil, nil
 	}
-	replicas := CreatePodFQDNsOfShard(shard)
-	system_tables := fmt.Sprintf("remote('%s', system, tables)", strings.Join(replicas, ","))
+	//replicas := CreatePodFQDNsOfShard(shard)
+	//system_tables := fmt.Sprintf("remote('%s', system, tables)", strings.Join(replicas, ","))
+        system_tables := "system.tables"//fmt.Sprintf("cluster('%s', system, tables)", cluster.Name)
 	sql := heredoc.Doc(strings.ReplaceAll(`
 		SELECT DISTINCT 
 			database AS name, 
