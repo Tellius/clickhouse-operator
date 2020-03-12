@@ -24,6 +24,7 @@ import (
 	"github.com/golang/glog"
         "github.com/MakeNowJust/heredoc"
 	"strings"
+        "fmt"
 )
 
 const (
@@ -60,12 +61,15 @@ func (s *Schemer) getObjectListFromClickHouse(serviceUrl string, sql string) ([]
         newServiceUrl:= "chi-repl-05-replicated-0-0.default.svc.cluster.local"
 
 	glog.V(1).Infof("running against %s",newServiceUrl)
+        fmt.Println("running query", sql)
         
 	conn := s.newConn(newServiceUrl)
 	var rows *sqlmodule.Rows = nil
 	var err error
 	rows, err = conn.Query(sql)
 	if err != nil {
+                fmt.Println("Runnning query ", sql)
+                fmt.Println("error in running query", err) 
 		return nil, nil, err
 	}
 
@@ -76,7 +80,7 @@ func (s *Schemer) getObjectListFromClickHouse(serviceUrl string, sql string) ([]
 			names = append(names, name)
 			sqlStatements = append(sqlStatements, sqlStatement)
 		} else {
-			// Skip erroneous line
+                        fmt.Println("lines failed with", err)
 		}
 	}
 	return names, sqlStatements, nil

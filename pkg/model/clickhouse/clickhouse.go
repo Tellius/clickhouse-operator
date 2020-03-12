@@ -27,7 +27,7 @@ import (
 const (
 	// http://user:password@host:8123/
 	chDsnUrlPattern = "http://%s%s:%s/"
-	defaultTimeout  = 10 * time.Second
+	defaultTimeout  = 100 * time.Second
 )
 
 type Conn struct {
@@ -76,8 +76,8 @@ func (c *Conn) Query(sql string) (*sqlmodule.Rows, error) {
 	}
 
 	// Query should be deadlined
-	ctx, cancel := context.WithDeadline(context.Background(), time.Now().Add(c.timeout))
-	defer cancel()
+	ctx, _ := context.WithDeadline(context.Background(), time.Now().Add(c.timeout))
+	//defer cancel()
 
 	dsn := c.makeDsn()
 	//glog.V(1).Infof("Query ClickHouse DSN: %s", dsn)
