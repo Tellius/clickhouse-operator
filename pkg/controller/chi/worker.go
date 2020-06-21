@@ -393,7 +393,7 @@ func (w *worker) deleteHost(host *chop.ChiHost) error {
 	// Need to delete all these item
 	glog.V(1).Infof("Worker delete host %s/%s", host.Address.ClusterName, host.Name)
 
-	_ = w.deleteTablesOnHost(host)
+	//_ = w.deleteTablesOnHost(host)
 
 	return w.c.deleteHost(host)
 }
