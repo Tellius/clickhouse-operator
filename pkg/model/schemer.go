@@ -58,7 +58,8 @@ func (s *Schemer) getObjectListFromClickHouse(serviceUrl string, sql string) ([]
 	names := make([]string, 0)
 	sqlStatements := make([]string, 0)
         //TODO:Make it configurable
-        newServiceUrl:= "chi-repl-05-replicated-0-0.default.svc.cluster.local"
+        //newServiceUrl:= "chi-repl-05-replicated-0-0.default.svc.cluster.local"
+        newServiceUrl := strings.Replace(serviceUrl, "clickhouse-repl-05", "chi-repl-05-replicated-0-0", 1)
 
 	glog.V(1).Infof("running against %s",newServiceUrl)
         fmt.Println("running query", sql)
